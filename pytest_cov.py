@@ -141,11 +141,11 @@ class CovPlugin(object):
             cov = self.cov_controller.cov
             cov_result = round(cov.html_report(ignore_errors=True), cov.config.precision)
             if float(self.options.cov_fail_under) <= cov_result:
-                stream.write('Coverage({0}%) is higher than the required({1}%).\n'
+                stream.write('\nSuccess: Coverage({0}%) is higher than the required({1}%).\n'
                              .format(cov_result, self.options.cov_fail_under))
             else:
                 self.session.exitstatus = FAIL_UNDER
-                stream.write('Coverage({0}%) is lower than the required({1}%)!\n'
+                stream.write('\nFailure: Coverage({0}%) is lower than the required({1}%)!\n'
                              .format(cov_result, self.options.cov_fail_under))
 
 
