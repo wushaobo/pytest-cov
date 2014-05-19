@@ -120,6 +120,56 @@ def test_central(testdir):
     assert result.ret == 0
 
 
+def test_ignore_coverage_fail_under_option_when_not_html_report(testdir):
+    script = testdir.makepyfile(SCRIPT)
+
+    required_coverage = 100
+    result = testdir.runpytest('-v',
+                               '--cov=%s' % script.dirpath(),
+                               '--cov-fail-under=%s' % required_coverage,
+                               '--cov-report=term-missing',
+                               script)
+
+    result.stdout.fnmatch_lines([
+        '*- coverage: platform *, python * -*',
+        'test_ignore_coverage_fail_under_option_when_not_html_report * %s *' % SCRIPT_RESULT,
+        '*10 passed*'
+        ])
+    assert result.ret == 0
+
+
+def test_return_failure_when_coverage_under_the_required(testdir):
+    script = testdir.makepyfile(SCRIPT)
+
+    required_coverage = 100
+    result = testdir.runpytest('-v',
+                               '--cov=%s' % script.dirpath(),
+                               '--cov-fail-under=%s' % required_coverage,
+                               '--cov-report=html',
+                               script)
+
+    assert result.ret == 2
+    result.stdout.fnmatch_lines([
+        'Coverage(87.5%) is lower than the required({}%)!'.format(required_coverage)
+    ])
+
+
+def test_return_ok_when_coverage_above_the_required(testdir):
+    script = testdir.makepyfile(SCRIPT)
+
+    required_coverage = 50
+    result = testdir.runpytest('-v',
+                               '--cov=%s' % script.dirpath(),
+                               '--cov-fail-under=%s' % required_coverage,
+                               '--cov-report=html',
+                               script)
+
+    assert result.ret == 0
+    result.stdout.fnmatch_lines([
+        'Coverage(87.5%) is higher than the required({}%).'.format(required_coverage)
+    ])
+
+
 def test_no_cov_on_fail(testdir):
     script = testdir.makepyfile(SCRIPT_FAIL)
 
@@ -131,6 +181,7 @@ def test_no_cov_on_fail(testdir):
 
     assert 'coverage: platform' not in result.stdout.str()
     result.stdout.fnmatch_lines(['*1 failed*'])
+    assert result.ret == 1
 
 
 def test_dist_collocated(testdir):

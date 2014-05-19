@@ -1,5 +1,5 @@
 """Coverage plugin for pytest."""
-
+from coverage.cmdline import FAIL_UNDER
 
 import pytest
 
@@ -28,6 +28,9 @@ def pytest_addoption(parser):
                     dest='no_cov_on_fail',
                     help='do not report coverage if test run fails, '
                          'default: False')
+    group.addoption('--cov-fail-under', action='store', default='-1',
+                    dest='cov_fail_under',
+                    help='py.test fails when coverage is under the required percentage if html report is specified.')
 
 
 @pytest.mark.try_last
@@ -67,6 +70,7 @@ class CovPlugin(object):
         self.cov_controller = None
         self.failed = False
         self.options = options
+        self.session = None
 
         is_dist = (getattr(options, 'numprocesses', False) or
                    getattr(options, 'distload', False) or
@@ -123,11 +127,25 @@ class CovPlugin(object):
         """Delegate to our implementation."""
         self.failed = exitstatus != 0
         self.cov_controller.finish()
+        self.session = session
 
     def pytest_terminal_summary(self, terminalreporter):
         """Delegate to our implementation."""
         if not (self.failed and self.options.no_cov_on_fail):
-            self.cov_controller.summary(terminalreporter._tw)
+            stream = terminalreporter._tw
+            self.cov_controller.summary(stream)
+
+            if not('html' in self.cov_controller.cov_report):
+                return
+
+            cov_result = self.cov_controller.cov.html_report(ignore_errors=True)
+            if float(self.options.cov_fail_under) <= cov_result:
+                stream.write('Coverage({0}%) is higher than the required({1}%).\n'
+                             .format(cov_result, self.options.cov_fail_under))
+            else:
+                self.session.exitstatus = FAIL_UNDER
+                stream.write('Coverage({0}%) is lower than the required({1}%)!\n'
+                             .format(cov_result, self.options.cov_fail_under))
 
 
 def pytest_funcarg__cov(request):
