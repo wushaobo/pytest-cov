@@ -150,7 +150,7 @@ def test_return_failure_when_coverage_under_the_required(testdir):
 
     assert result.ret == 2
     result.stdout.fnmatch_lines([
-        'Coverage(87.5%) is lower than the required({}%)!'.format(required_coverage)
+        'Coverage(88.0%) is lower than the required({}%)!'.format(required_coverage)
     ])
 
 
@@ -166,7 +166,7 @@ def test_return_ok_when_coverage_above_the_required(testdir):
 
     assert result.ret == 0
     result.stdout.fnmatch_lines([
-        'Coverage(87.5%) is higher than the required({}%).'.format(required_coverage)
+        'Coverage(88.0%) is higher than the required({}%).'.format(required_coverage)
     ])
 
 

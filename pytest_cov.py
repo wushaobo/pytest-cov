@@ -28,7 +28,7 @@ def pytest_addoption(parser):
                     dest='no_cov_on_fail',
                     help='do not report coverage if test run fails, '
                          'default: False')
-    group.addoption('--cov-fail-under', action='store', default='-1',
+    group.addoption('--cov-fail-under', action='store', default='0',
                     dest='cov_fail_under',
                     help='py.test fails when coverage is under the required percentage if html report is specified.')
 
@@ -138,7 +138,8 @@ class CovPlugin(object):
             if not('html' in self.cov_controller.cov_report):
                 return
 
-            cov_result = self.cov_controller.cov.html_report(ignore_errors=True)
+            cov = self.cov_controller.cov
+            cov_result = round(cov.html_report(ignore_errors=True), cov.config.precision)
             if float(self.options.cov_fail_under) <= cov_result:
                 stream.write('Coverage({0}%) is higher than the required({1}%).\n'
                              .format(cov_result, self.options.cov_fail_under))
