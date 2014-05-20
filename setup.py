@@ -1,7 +1,7 @@
 import setuptools
 
 setuptools.setup(name='pytest-cov',
-                 version='1.6',
+                 version='1.6-dev',
                  description='py.test plugin for coverage reporting with '
                  'support for both centralised and distributed testing, '
                  'including subprocesses and multiprocessing',
@@ -21,10 +21,6 @@ setuptools.setup(name='pytest-cov',
                               'License :: OSI Approved :: MIT License',
                               'Operating System :: OS Independent',
                               'Programming Language :: Python',
-                              'Programming Language :: Python :: 2.4',
-                              'Programming Language :: Python :: 2.5',
-                              'Programming Language :: Python :: 2.6',
                               'Programming Language :: Python :: 2.7',
-                              'Programming Language :: Python :: 3.0',
-                              'Programming Language :: Python :: 3.1',
+                              'Programming Language :: Python :: 3.4',
                               'Topic :: Software Development :: Testing'])
